@@ -90,6 +90,7 @@ private:
 	float mass = 1.0f;
 	float linear_damp = 0.0f;
 	float angular_damp = 0.0f;
+	int velocity_iterations = 0;
 	float total_linear_damp = 0.0f;
 	float total_angular_damp = 0.0f;
 	float collision_priority = 1.0f;
@@ -134,6 +135,7 @@ private:
 	void _update_group_filter();
 	void _update_joint_constraints();
 	void _update_possible_kinematic_contacts();
+	void _update_velocity_iterations();
 	void _update_sleep_allowed();
 
 	void _destroy_joint_constraints();
@@ -289,6 +291,9 @@ public:
 
 	float get_angular_damp() const { return angular_damp; }
 	void set_angular_damp(float p_damp);
+
+	int get_velocity_iterations() const { return velocity_iterations; }
+	void set_velocity_iterations(int p_iterations);
 
 	float get_total_linear_damp() const { return total_linear_damp; }
 	float get_total_angular_damp() const { return total_angular_damp; }

@@ -103,6 +103,7 @@ void JoltBody3D::_add_to_space() {
 	jolt_settings->mCollideKinematicVsNonDynamic = reports_all_kinematic_contacts();
 	jolt_settings->mUseManifoldReduction = !reports_contacts();
 	jolt_settings->mAllowSleeping = is_sleep_actually_allowed();
+	jolt_settings->mNumVelocityStepsOverride = (JPH::uint)velocity_iterations;
 	jolt_settings->mLinearDamping = 0.0f;
 	jolt_settings->mAngularDamping = 0.0f;
 	jolt_settings->mMaxLinearVelocity = JoltProjectSettings::max_linear_velocity;
@@ -383,6 +384,23 @@ void JoltBody3D::_update_possible_kinematic_contacts() {
 	}
 }
 
+void JoltBody3D::_update_velocity_iterations() {
+	if (!in_space()) {
+		jolt_settings->mNumVelocityStepsOverride = (JPH::uint)velocity_iterations;
+	} else {
+		// Bodies created without motion properties return null.
+		JPH::MotionProperties *motion_properties = jolt_body->GetMotionPropertiesUnchecked();
+		if (motion_properties != nullptr) {
+			motion_properties->SetNumVelocityStepsOverride((JPH::uint)velocity_iterations);
+		}
+	}
+}
+
+void JoltBody3D::set_velocity_iterations(int p_iterations) {
+	velocity_iterations = CLAMP(p_iterations, 0, 255);
+	_update_velocity_iterations();
+}
+
 void JoltBody3D::_update_sleep_allowed() {
 	const bool value = is_sleep_actually_allowed();
 
@@ -423,6 +441,7 @@ void JoltBody3D::_mode_changed() {
 	_update_kinematic_transform();
 	_update_mass_properties();
 	_update_sleep_allowed();
+	_update_velocity_iterations();
 	wake_up();
 }
 
@@ -617,6 +636,9 @@ Variant JoltBody3D::get_param(PhysicsServer3D::BodyParameter p_param) const {
 		case PhysicsServer3D::BODY_PARAM_ANGULAR_DAMP: {
 			return get_angular_damp();
 		}
+		case PhysicsServer3D::BODY_PARAM_SOLVER_VELOCITY_ITERATIONS: {
+			return get_velocity_iterations();
+		}
 		default: {
 			ERR_FAIL_V_MSG(Variant(), vformat("Unhandled body parameter: '%d'. This should not happen. Please report this.", p_param));
 		}
@@ -654,6 +676,9 @@ void JoltBody3D::set_param(PhysicsServer3D::BodyParameter p_param, const Variant
 		} break;
 		case PhysicsServer3D::BODY_PARAM_ANGULAR_DAMP: {
 			set_angular_damp(p_value);
+		} break;
+		case PhysicsServer3D::BODY_PARAM_SOLVER_VELOCITY_ITERATIONS: {
+			set_velocity_iterations(p_value);
 		} break;
 		default: {
 			ERR_FAIL_MSG(vformat("Unhandled body parameter: '%d'. This should not happen. Please report this.", p_param));

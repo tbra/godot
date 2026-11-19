@@ -247,6 +247,9 @@ void GodotBody3D::set_param(PhysicsServer3D::BodyParameter p_param, const Varian
 		case PhysicsServer3D::BODY_PARAM_ANGULAR_DAMP: {
 			angular_damp = p_value;
 		} break;
+		case PhysicsServer3D::BODY_PARAM_SOLVER_VELOCITY_ITERATIONS: {
+			// Jolt only, ignored by GodotPhysics.
+		} break;
 		default: {
 		}
 	}
@@ -287,6 +290,10 @@ Variant GodotBody3D::get_param(PhysicsServer3D::BodyParameter p_param) const {
 		} break;
 		case PhysicsServer3D::BODY_PARAM_ANGULAR_DAMP: {
 			return angular_damp;
+		} break;
+		case PhysicsServer3D::BODY_PARAM_SOLVER_VELOCITY_ITERATIONS: {
+			// Jolt only, ignored by GodotPhysics.
+			return 0;
 		} break;
 
 		default: {
